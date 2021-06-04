@@ -76,7 +76,7 @@ class BotEvents(commands.Cog):
                 title="Welcome " + member.name + "!",
                 description=f"Please {member.mention} goto <#849951809195474966> and get your **updates roles**",
                 color=discord.Color.random(),
-                timestamp=datetime.datetime.utcnow() + datetime.timedelta(hours=5, minutes=30),
+                timestamp=datetime.datetime.utcnow(),
             )
             embed.set_image(url='https://i.imgur.com/mktY446.jpeg')
             embed.set_thumbnail(url='https://i.imgur.com/SizgkEZ.png')
