@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 
 import discord
@@ -61,7 +62,41 @@ class BotEvents(commands.Cog):
             e9.set_thumbnail(url=f"{haaha}")
             e9.set_footer(text=f"{ctx.author.name}")
             await ctx.channel.send(embed=e9, delete_after=2)
-            await ctx.send('**Error report was successfully sent**', delete_after=2)
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        if member.bot:
+            embed = discord.Embed(
+                title="Seems a new bot added",
+                description=f"<@&836984945854644285> please review this! Its urgent! Seems a new bot named {member.mention} entered! **Sus !**",
+                color=discord.Color.red()
+            )
+        else:
+            embed = discord.Embed(
+                title="Welcome " + member.name + "!",
+                description=f"Please {member.mention} goto <#849951809195474966> and get your **updates roles**",
+                color=discord.Color.random(),
+                timestamp=datetime.datetime.utcnow() + datetime.timedelta(hours=5, minutes=30),
+            )
+            embed.set_image(url='https://i.imgur.com/mktY446.jpeg')
+            embed.set_thumbnail(url='https://i.imgur.com/SizgkEZ.png')
+            embed.set_author(name=self.bot.user.name,
+                             icon_url=self.bot.user.avatar_url)
+            embed.set_footer(text=f"Welcome {member.name}")
+        
+        guild = self.bot.get_guild(836841841114480651)
+
+        if not member.bot:
+            # Gets the member role as a `role` object
+            role = discord.utils.get(
+                guild.roles, id=836985437738369094)
+        else:
+            role = discord.utils.get(
+                guild.roles, id=850355806926798909)
+        await member.add_roles(role)  # Gives the role to the user
+        channel = discord.utils.get(
+            self.bot.get_all_channels(), id=836934061297106955)
+        await channel.send(embed=embed)
 
 
 def setup(bot):
