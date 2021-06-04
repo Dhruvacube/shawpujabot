@@ -148,7 +148,8 @@ class Database:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT message_id FROM messages WHERE channel = ?;", (channel,)
+                "SELECT message_id FROM messages WHERE channel = ?;", (
+                    channel,)
             )
             all_messages_in_channel = []
             for row in cursor:
@@ -224,7 +225,8 @@ class Database:
             )
             # Delete the guilds potencial cleanup_queue entries
             cursor.execute(
-                "DELETE FROM cleanup_queue_guilds WHERE guild_id=?;", (guild_id,)
+                "DELETE FROM cleanup_queue_guilds WHERE guild_id=?;", (
+                    guild_id,)
             )
             conn.commit()
 
@@ -303,7 +305,8 @@ class Database:
         try:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM admins WHERE guild_id = ?;", (guild_id,))
+            cursor.execute(
+                "SELECT * FROM admins WHERE guild_id = ?;", (guild_id,))
             admins = []
             for row in cursor:
                 role_id = row[0]
@@ -477,7 +480,8 @@ class Database:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
             cursor.execute(
-                "DELETE FROM cleanup_queue_guilds WHERE guild_id=?;", (guild_id,)
+                "DELETE FROM cleanup_queue_guilds WHERE guild_id=?;", (
+                    guild_id,)
             )
             conn.commit()
             cursor.close()
@@ -515,7 +519,8 @@ class Database:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT notify FROM guild_settings WHERE guild_id = ?", (guild_id,)
+                "SELECT notify FROM guild_settings WHERE guild_id = ?", (
+                    guild_id,)
             )
             results = cursor.fetchall()
             if not results:
@@ -556,7 +561,8 @@ class Database:
             conn = sqlite3.connect(self.database)
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT notify FROM guild_settings WHERE guild_id = ?", (guild_id,)
+                "SELECT notify FROM guild_settings WHERE guild_id = ?", (
+                    guild_id,)
             )
             results = cursor.fetchall()
             if not results:

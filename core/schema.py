@@ -1,4 +1,5 @@
 import sqlite3
+
 import discord
 
 
@@ -28,11 +29,13 @@ class SchemaHandler:
         if version > 0:
             previous = version - 1
             cursor.execute(
-                "UPDATE dbinfo SET version = ? WHERE version = ?;", (version, previous)
+                "UPDATE dbinfo SET version = ? WHERE version = ?;", (
+                    version, previous)
             )
 
         else:
-            cursor.execute("INSERT INTO dbinfo(version) values(?);", (version,))
+            cursor.execute(
+                "INSERT INTO dbinfo(version) values(?);", (version,))
 
         conn.commit()
         cursor.close()
@@ -114,7 +117,8 @@ class SchemaHandler:
         result = cursor.fetchall()
         columns = [value[1] for value in result]
         if "limit_to_one" not in columns:
-            cursor.execute("ALTER TABLE messages ADD COLUMN 'limit_to_one' INT;")
+            cursor.execute(
+                "ALTER TABLE messages ADD COLUMN 'limit_to_one' INT;")
             cursor.execute(
                 "UPDATE messages SET limit_to_one = 0 WHERE limit_to_one IS NULL;"
             )

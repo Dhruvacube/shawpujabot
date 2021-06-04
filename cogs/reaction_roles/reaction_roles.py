@@ -1,9 +1,8 @@
 import asyncio
+
 import discord
-from discord.ext import commands, tasks
-
 from core import database, schema
-
+from discord.ext import commands, tasks
 
 
 class ReactionRoles(commands.Cog):
@@ -11,8 +10,9 @@ class ReactionRoles(commands.Cog):
         self.bot = bot
         self.prefix = 's!'
         self.db = bot.db
-        
-    def isadmin(self,member, guild_id):
+        self.description = "Create reaction roles"
+
+    def isadmin(self, member, guild_id):
         # Checks if command author has an admin role that was added with rl!admin
         admins = self.db.get_admins(guild_id)
 
@@ -28,8 +28,7 @@ class ReactionRoles(commands.Cog):
             # Error raised from 'fake' users, such as webhooks
             return False
 
-
-    async def getchannel(self,channel_id):
+    async def getchannel(self, channel_id):
         channel = self.bot.get_channel(channel_id)
 
         if not channel:
@@ -37,8 +36,7 @@ class ReactionRoles(commands.Cog):
 
         return channel
 
-
-    async def getguild(self,guild_id):
+    async def getguild(self, guild_id):
         guild = self.bot.get_guild(guild_id)
 
         if not guild:
@@ -46,8 +44,7 @@ class ReactionRoles(commands.Cog):
 
         return guild
 
-
-    async def getuser(self,user_id):
+    async def getuser(self, user_id):
         user = self.bot.get_user(user_id)
 
         if not user:
@@ -55,10 +52,10 @@ class ReactionRoles(commands.Cog):
 
         return user
 
-
     async def system_notification(self, guild_id, text, embed=None):
         # Send a message to the system channel (if set)
-        system_channel = await self.getguild(guild_id).system_channel
+        system_channel1 = await self.getguild(guild_id)
+        system_channel = system_channel1.system_channel
         if guild_id:
             server_channel = self.db.fetch_systemchannel(guild_id)
 
@@ -107,8 +104,7 @@ class ReactionRoles(commands.Cog):
         else:
             print(text)
 
-
-    async def formatted_channel_list(self,channel):
+    async def formatted_channel_list(self, channel):
         all_messages = self.db.fetch_messages(channel.id)
         if isinstance(all_messages, Exception):
             await self.system_notification(
@@ -145,20 +141,9 @@ class ReactionRoles(commands.Cog):
 
         return formatted_list
 
-    @tasks.loop(hours=6)
-    async def check_cleanup_queued_guilds(self):
-        cleanup_guild_ids = self.db.fetch_cleanup_guilds(guild_ids_only=True)
-        for guild_id in cleanup_guild_ids:
-            try:
-                await self.bot.fetch_guild(guild_id)
-                self.db.remove_cleanup_guild(guild_id)
-
-            except discord.Forbidden:
-                continue
-
-
     @commands.command(name="new", aliases=["create"])
     async def new(self, ctx):
+        '''Create a new reaction'''
         if self.isadmin(ctx.message.author, ctx.guild.id):
             sent_initial_message = await ctx.send(
                 "Welcome to the Reaction Light creation program. Please provide the required information once requested. If you would like to abort the creation, do not respond and the program will time out."
@@ -413,7 +398,8 @@ class ReactionRoles(commands.Cog):
                     description="Embed_content",
                     colour=discord.Color.random(),
                 )
-                selector_embed.set_footer(text=f"{botname}", icon_url=logo)
+                selector_embed.set_footer(
+                    text=f"{self.bot.user.name}", icon_url=self.bot.user.avatar_url)
 
                 sent_message_message = await message.channel.send(
                     "What would you like the message to say?\nFormatting is:"
@@ -435,10 +421,13 @@ class ReactionRoles(commands.Cog):
                         # But it would be a breaking change that would be annoying for thoose who have saved their message commands
                         # for editing.
                         selector_msg_body = (
-                            msg_values[0] if msg_values[0].lower() != "none" else None
+                            msg_values[0] if msg_values[0].lower(
+                            ) != "none" else None
                         )
-                        selector_embed = discord.Embed(colour=discord.Color.random())
-                        selector_embed.set_footer(text=f"{botname}", icon_url=logo)
+                        selector_embed = discord.Embed(
+                            colour=discord.Color.random())
+                        selector_embed.set_footer(
+                            text=f"{self.bot.user.name}", icon_url=self.bot.user.avatar_url)
 
                         if len(msg_values) > 1:
                             if msg_values[1].lower() != "none":
@@ -515,9 +504,9 @@ class ReactionRoles(commands.Cog):
                 " first."
             )
 
-
     @commands.command(name="edit")
     async def edit_selector(self, ctx):
+        '''edits the text and embed of an existing reaction role message.'''
         if self.isadmin(ctx.message.author, ctx.guild.id):
             # Reminds user of formatting if it is wrong
             msg_values = ctx.message.content.split()
@@ -557,7 +546,8 @@ class ReactionRoles(commands.Cog):
                         " New Embed Description (Optional)\n```\nto edit the desired one."
                         " You can type `none` in any of the argument fields above (e.g."
                         " `New Message`) to make the bot ignore it. The list of the"
-                        " current reaction-role messages is:\n\n" + "\n".join(all_messages)
+                        " current reaction-role messages is:\n\n" +
+                        "\n".join(all_messages)
                     )
 
                 else:
@@ -610,19 +600,22 @@ class ReactionRoles(commands.Cog):
                         return
                     await old_msg.edit(suppress=False)
                     selector_msg_new_body = (
-                        msg_values[2] if msg_values[2].lower() != "none" else None
+                        msg_values[2] if msg_values[2].lower(
+                        ) != "none" else None
                     )
                     selector_embed = discord.Embed()
 
                     if len(msg_values) > 3 and msg_values[3].lower() != "none":
                         selector_embed.title = msg_values[3]
                         selector_embed.colour = discord.Color.random()
-                        selector_embed.set_footer(text=f"{botname}", icon_url=logo)
+                        selector_embed.set_footer(
+                            text=f"{self.bot.user.name}", icon_url=self.bot.user.avatar_url)
 
                     if len(msg_values) > 4 and msg_values[4].lower() != "none":
                         selector_embed.description = msg_values[4]
                         selector_embed.colour = discord.Color.random()
-                        selector_embed.set_footer(text=f"{botname}", icon_url=logo)
+                        selector_embed.set_footer(
+                            text=f"{self.bot.user.name}", icon_url=self.bot.user.avatar_url)
 
                     try:
                         if selector_embed.title or selector_embed.description:
@@ -658,9 +651,9 @@ class ReactionRoles(commands.Cog):
         else:
             await ctx.send("You do not have an admin role.")
 
-
     @commands.command(name="reaction")
     async def edit_reaction(self, ctx):
+        '''adds or removes a reaction from an existing reaction role message.'''
         if self.isadmin(ctx.message.author, ctx.guild.id):
             msg_values = ctx.message.content.split()
             mentioned_roles = ctx.message.role_mentions
@@ -692,7 +685,8 @@ class ReactionRoles(commands.Cog):
                         " MESSAGE_NUMBER :reaction:"
                         f" @rolename\n```or\n```\n{self.prefix}reaction remove"
                         f" #{channel.name} MESSAGE_NUMBER :reaction:\n```\nThe list of the"
-                        " current reaction-role messages is:\n\n" + "\n".join(all_messages)
+                        " current reaction-role messages is:\n\n" +
+                        "\n".join(all_messages)
                     )
                     return
 
@@ -757,7 +751,8 @@ class ReactionRoles(commands.Cog):
                     )
                     return
 
-                react = self.db.add_reaction(message_to_edit.id, role.id, reaction)
+                react = self.db.add_reaction(
+                    message_to_edit.id, role.id, reaction)
                 if isinstance(react, Exception):
                     await self.system_notification(
                         ctx.message.guild.id,
@@ -797,9 +792,9 @@ class ReactionRoles(commands.Cog):
         else:
             await ctx.send("You do not have an admin role.")
 
-
     @commands.command(name="systemchannel")
     async def set_systemchannel(self, ctx):
+        '''updates the main or server system channel where the bot sends errors and update notifications.'''
         if self.isadmin(ctx.message.author, ctx.guild.id):
             msg = ctx.message.content.split()
             mentioned_channels = ctx.message.channel_mentions
@@ -848,7 +843,8 @@ class ReactionRoles(commands.Cog):
                 return
 
             if channel_type == "server":
-                add_channel = self.db.add_systemchannel(guild_id, target_channel)
+                add_channel = self.db.add_systemchannel(
+                    guild_id, target_channel)
 
                 if isinstance(add_channel, Exception):
                     await self.system_notification(
@@ -863,9 +859,9 @@ class ReactionRoles(commands.Cog):
         else:
             await ctx.send("You do not have an admin role.")
 
-
     @commands.command(name="notify")
     async def toggle_notify(self, ctx):
+        '''toggles sending messages to users when they get/lose a role (default off) for the current server (the command affects only the server it was used in).'''
         if self.isadmin(ctx.message.author, ctx.guild.id):
             notify = self.db.toggle_notify(ctx.guild.id)
             if notify:
@@ -879,10 +875,10 @@ class ReactionRoles(commands.Cog):
                     "Use this command again to turn them on."
                 )
 
-
     @commands.command(pass_context=True, name="admin")
     @commands.has_permissions(administrator=True)
     async def add_admin(self, ctx, role: discord.Role):
+        '''adds the mentioned role or role id to the admin list, allowing members with a certain role to use the bot commands. Requires administrator permissions on the server.'''
         # Adds an admin role ID to the database
         add = self.db.add_admin(role.id, ctx.guild.id)
 
@@ -895,16 +891,15 @@ class ReactionRoles(commands.Cog):
 
         await ctx.send("Added the role to my admin list.")
 
-
     @add_admin.error
-    async def add_admin_error(ctx, error):
+    async def add_admin_error(self, ctx, error):
         if isinstance(error, commands.RoleNotFound):
             await ctx.send("Please mention a valid @Role or role ID.")
-
 
     @commands.command(name="rm-admin")
     @commands.has_permissions(administrator=True)
     async def remove_admin(self, ctx, role: discord.Role):
+        '''removes the mentioned role or role id from the admin list, preventing members with a certain role from using the bot commands. Requires administrator permissions on the server.'''
         # Removes an admin role ID from the database
         remove = self.db.remove_admin(role.id, ctx.guild.id)
 
@@ -917,10 +912,10 @@ class ReactionRoles(commands.Cog):
 
         await ctx.send("Removed the role from my admin list.")
 
-
     @commands.command(name="adminlist")
     @commands.has_permissions(administrator=True)
-    async def list_admin(self,ctx):
+    async def list_admin(self, ctx):
+        '''lists the current admins on the server the command was run in by mentioning them and the current admins from other servers by printing out the role IDs. Requires administrator permissions on the server.'''
         # Lists all admin IDs in the database, mentioning them if possible
         admin_ids = self.db.get_admins(ctx.guild.id)
 
@@ -939,14 +934,17 @@ class ReactionRoles(commands.Cog):
 
         if adminrole_objects:
             await ctx.send(
-                "The bot admins on this server are:\n- " + "\n- ".join(adminrole_objects)
+                "The bot admins on this server are:\n- " +
+                "\n- ".join(adminrole_objects)
             )
         else:
             await ctx.send("There are no bot admins registered in this server.")
-
 
     @remove_admin.error
     async def remove_admin_error(self, ctx, error):
         if isinstance(error, commands.RoleNotFound):
             await ctx.send("Please mention a valid @Role or role ID.")
 
+
+def setup(bot):
+    bot.add_cog(ReactionRoles(bot))

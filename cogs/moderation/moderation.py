@@ -35,6 +35,7 @@ class Moderation(commands.Cog):
     @commands.guild_only()
     async def setdelay(self, ctx, seconds: int):
         """Sets Slowmode Of A Channel"""
+        await ctx.message.delete()
         currentslow = ctx.channel.slowmode_delay
         if currentslow == seconds:
             return await ctx.send(f"Sorry, But this channel already has {seconds} set as the delay! (I don't want to waste my api calls lmao)")
@@ -54,18 +55,12 @@ class Moderation(commands.Cog):
     @commands.has_guild_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, *, reason=None):
         '''A command which kicks a given user'''
+        await ctx.message.delete()
         await member.kick(reason=reason)
 
         embed = discord.Embed(
             title=f"{ctx.author.name} kicked: {member.name}", description=reason)
         await ctx.send(embed=embed)
-
-    @kick.error
-    async def error_handler(self, ctx, error):
-        if isinstance(error, commands.BotMissingPermissions):
-            await ctx.send(f"I need the permissions: {' '.join(error.missing_perms)}")
-        else:
-            await ctx.send(error)
 
     @commands.command(
         name="ban",
@@ -77,20 +72,13 @@ class Moderation(commands.Cog):
     @commands.has_guild_permissions(ban_members=True)
     async def ban(self, ctx, member: discord.Member, *, reason=None):
         '''A command which bans a given user'''
+        await ctx.message.delete()
         await member.ban(reason=reason)
 
         embed = discord.Embed(
             title=f"{ctx.author.name} banned: {member.name}", description=reason
         )
         await ctx.send(embed=embed)
-
-    @ban.error
-    async def error_handler(self, ctx, error):
-        if isinstance(error, discord.BotMissingPermissions):
-            await ctx.send(f"I need the permissions: {' '.join(error.missing_perms)}")
-
-        else:
-            raise error
 
     @commands.command(
         name="unban",
@@ -99,19 +87,18 @@ class Moderation(commands.Cog):
     )
     @commands.guild_only()
     @commands.has_guild_permissions(ban_members=True)
-    async def unban(self, ctx, member: discord.Member, *, reason=None):
+    async def unban(self, ctx, *, member: str):
         '''A command which unbans a given user'''
+        await ctx.message.delete()
         banned_users = await ctx.guild.bans()
-        member_name, member_discriminator = member.split("#")
+
+        member_name, member_discriminator = member.split('#')
         for ban_entry in banned_users:
             user = ban_entry.user
 
             if (user.name, user.discriminator) == (member_name, member_discriminator):
                 await ctx.guild.unban(user)
-                embed = discord.Embed(
-                    title=f"{ctx.author.name} unbanned: {member.name}", description=reason
-                )
-                await ctx.send(embed=embed)
+                await ctx.channel.send(f"Unbanned: {user.mention}")
 
     @commands.command(
         name="purge",

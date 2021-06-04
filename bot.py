@@ -5,15 +5,18 @@ from pathlib import Path
 import discord
 import dotenv
 from discord.ext import commands
-from discord_slash import SlashCommand
 from pretty_help import PrettyHelp
+
 from core import database, schema
 
 dotenv_file = os.path.join(".env")
+
+
 def token_get(tokenname):
     if os.path.isfile(dotenv_file):
         dotenv.load_dotenv(dotenv_file)
     return os.environ.get(tokenname, 'False').strip('\n')
+
 
 intents = discord.Intents.default()
 intents.members = True
@@ -22,7 +25,7 @@ intents.messages = True
 intents.emojis = True
 
 bot = commands.Bot(
-    command_prefix='s!', 
+    command_prefix='s!',
     intents=intents,
     help_command=PrettyHelp(show_index=True),
     allowed_mentions=discord.AllowedMentions(
@@ -31,13 +34,13 @@ bot = commands.Bot(
         everyone=False
     ),
     case_insensitive=True,
+    strip_after_prefix=True
 )
 
 directory = os.path.dirname(os.path.realpath(__file__))
-bot.db_file = f"{directory}/files/reactionlight.db"
+bot.db_file = f"{directory}/reactionlight.db"
 bot.db = database.Database(bot.db_file)
 
-slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
 
 cog_dir = Path(__file__).resolve(strict=True).parent / join('cogs')
 for filename in os.listdir(cog_dir):

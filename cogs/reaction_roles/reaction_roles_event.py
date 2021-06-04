@@ -1,6 +1,6 @@
-from pathlib import Path
 import asyncio
 import datetime
+from pathlib import Path
 
 import discord
 from discord.ext import commands, tasks
@@ -27,10 +27,36 @@ class ReactionRolesEvents(commands.Cog):
         self.bot = bot
         self.db = bot.db
         self.base_dir = Path(__file__).resolve().parent
-    
+
+    async def getguild(self, guild_id):
+        guild = self.bot.get_guild(guild_id)
+
+        if not guild:
+            guild = await self.bot.fetch_guild(guild_id)
+
+        return guild
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print("Reaction Light ready!")
+        self.cleandb.start()
+        self.check_cleanup_queued_guilds.start()
+
+    @tasks.loop(hours=6)
+    async def check_cleanup_queued_guilds(self):
+        cleanup_guild_ids = self.db.fetch_cleanup_guilds(guild_ids_only=True)
+        for guild_id in cleanup_guild_ids:
+            try:
+                await self.bot.fetch_guild(guild_id)
+                self.db.remove_cleanup_guild(guild_id)
+
+            except discord.Forbidden:
+                continue
+
     async def system_notification(self, guild_id, text, embed=None):
         # Send a message to the system channel (if set)
-        system_channel = await self.getguild(guild_id).system_channel
+        system_channel1 = await self.getguild(guild_id)
+        system_channel = system_channel1.system_channel
         if guild_id:
             server_channel = self.db.fetch_systemchannel(guild_id)
 
@@ -78,7 +104,7 @@ class ReactionRolesEvents(commands.Cog):
 
         else:
             print(text)
-    
+
     @tasks.loop(hours=24)
     async def cleandb(self):
         # Cleans the database by deleting rows of reaction role messages that don't exist anymore
@@ -190,11 +216,11 @@ class ReactionRolesEvents(commands.Cog):
                             f" database cleaning:\n```\n{delete2}\n```",
                         )
                         return
-    
+
     @commands.Cog.listener()
-    async def on_guild_remove(self,guild):
+    async def on_guild_remove(self, guild):
         self.db.remove_guild(guild.id)
-    
+
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         reaction = str(payload.emoji)
@@ -222,9 +248,9 @@ class ReactionRolesEvents(commands.Cog):
                     )
                     return
 
-                ch = await getchannel(ch_id)
+                ch = self.bot.get_channel(ch_id)
                 msg = await ch.fetch_message(msg_id)
-                user = await getuser(user_id)
+                user = self.bot.get_user(user_id)
                 if reaction not in reactions:
                     # Removes reactions added to the reaction-role message that are not connected to any role
                     await msg.remove_reaction(reaction, user)
@@ -232,7 +258,7 @@ class ReactionRolesEvents(commands.Cog):
                 else:
                     # Gives role if it has permissions, else 403 error is raised
                     role_id = reactions[reaction]
-                    server = await getguild(guild_id)
+                    server = await self.getguild(guild_id)
                     member = server.get_member(user_id)
                     role = discord.utils.get(server.roles, id=role_id)
                     if user_id != self.bot.user.id:
@@ -270,9 +296,9 @@ class ReactionRolesEvents(commands.Cog):
                                 " hierarchically higher than the role I have to assign, and"
                                 " that I have the `Manage Roles` permission.",
                             )
-    
+
     @commands.Cog.listener()
-    async def on_raw_reaction_remove(self,payload):
+    async def on_raw_reaction_remove(self, payload):
         reaction = str(payload.emoji)
         msg_id = payload.message_id
         user_id = payload.user_id
@@ -298,7 +324,7 @@ class ReactionRolesEvents(commands.Cog):
             elif reaction in reactions:
                 role_id = reactions[reaction]
                 # Removes role if it has permissions, else 403 error is raised
-                server = await getguild(guild_id)
+                server = await self.getguild(guild_id)
                 member = server.get_member(user_id)
 
                 if not member:

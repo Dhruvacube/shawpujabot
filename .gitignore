@@ -1,2 +1,5 @@
 .vscode/*
 .env
+reactionlight.db
+*.pyc
+__pycache__
