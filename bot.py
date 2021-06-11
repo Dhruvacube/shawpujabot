@@ -34,7 +34,8 @@ bot = commands.Bot(
         everyone=False
     ),
     case_insensitive=True,
-    strip_after_prefix=True
+    strip_after_prefix=True,
+    owner_ids = set([571889108046184449, 747729781369602049])
 )
 
 directory = os.path.dirname(os.path.realpath(__file__))

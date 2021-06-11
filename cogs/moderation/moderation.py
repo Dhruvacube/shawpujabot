@@ -29,6 +29,12 @@ class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.description = 'Some simple moderation commands'
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    @commands.guild_only()
+    async def say(self, ctx, message):
+        await ctx.send(message)
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)

@@ -27,6 +27,14 @@ class ReactionRolesEvents(commands.Cog):
         self.bot = bot
         self.db = bot.db
         self.base_dir = Path(__file__).resolve().parent
+    
+    async def getchannel(self, channel_id):
+        channel = self.bot.get_channel(channel_id)
+
+        if not channel:
+            channel = await self.bot.fetch_channel(channel_id)
+
+        return channel
 
     async def getguild(self, guild_id):
         guild = self.bot.get_guild(guild_id)
