@@ -54,13 +54,13 @@ class BoostPlugin(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        channel_message = self.bot.get_channel(852821942130180156)
         if message.type == discord.MessageType.premium_guild_subscription:
             try:
                 desc = f"Thank you {message.author.mention} so much for **boosting** <a:nitro1:852813350545915905> !"
             except:
                 desc = "Thank you so much for **boosting** <a:nitro1:852813350545915905> !"
             await message.add_reaction("<a:love_heart:852813348101816370>")
-            channel_message = self.bot.get_channel(852821942130180156)
             
             #boost
             embed = discord.Embed(
