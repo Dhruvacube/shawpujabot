@@ -65,40 +65,41 @@ class BotEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        channel = discord.utils.get(
-            self.bot.get_all_channels(), id=836934061297106955)
-        if member.bot:
-            embed = discord.Embed(
-                title="Seems a new bot added",
-                description=f"<@&836984945854644285> please review this! Its urgent! Seems a new bot named {member.mention} entered! **Sus !**",
-                color=discord.Color.red()
-            )
-            await channel.send('<@&836984945854644285>')
-        else:
-            embed = discord.Embed(
-                title="Welcome " + member.name + "!",
-                description=f"Please {member.mention} goto <#849951809195474966> and get your **updates roles**",
-                color=discord.Color.random(),
-                timestamp=datetime.datetime.utcnow(),
-            )
-            embed.set_image(url='https://i.imgur.com/mktY446.jpeg')
-            embed.set_thumbnail(url='https://i.imgur.com/SizgkEZ.png')
-            embed.set_author(name=self.bot.user.name,
-                             icon_url=self.bot.user.avatar_url)
-            embed.set_footer(text=f"Welcome {member.name}")
-            await channel.send(member.mention)
-        
-        guild = self.bot.get_guild(836841841114480651)
+        if member.guild.id == 836841841114480651:
+            channel = discord.utils.get(
+                self.bot.get_all_channels(), id=836934061297106955)
+            if member.bot:
+                embed = discord.Embed(
+                    title="Seems a new bot added",
+                    description=f"<@&854764518316179466> please review this! Its urgent! Seems a new bot named {member.mention} entered! **Sus !**",
+                    color=discord.Color.red()
+                )
+                await channel.send(f'<@&854764518316179466> or {member.guild.owner.mention}')
+            else:
+                embed = discord.Embed(
+                    title="Welcome " + member.name + "!",
+                    description=f"Please {member.mention} goto <#849951809195474966> and get your **updates roles**",
+                    color=discord.Color.random(),
+                    timestamp=datetime.datetime.utcnow(),
+                )
+                embed.set_image(url='https://i.imgur.com/mktY446.jpeg')
+                embed.set_thumbnail(url='https://i.imgur.com/SizgkEZ.png')
+                embed.set_author(name=self.bot.user.name,
+                                icon_url=self.bot.user.avatar_url)
+                embed.set_footer(text=f"Welcome {member.name}")
+                await channel.send(member.mention)
+            
+            guild = member.guild
 
-        if not member.bot:
-            # Gets the member role as a `role` object
-            role = discord.utils.get(
-                guild.roles, id=836985437738369094)
-        else:
-            role = discord.utils.get(
-                guild.roles, id=850355806926798909)
-        await member.add_roles(role)  # Gives the role to the user
-        await channel.send(embed=embed)
+            if not member.bot:
+                # Gets the member role as a `role` object
+                role = discord.utils.get(
+                    guild.roles, id=836985437738369094)
+            else:
+                role = discord.utils.get(
+                    guild.roles, id=850355806926798909)
+            await member.add_roles(role)  # Gives the role to the user
+            await channel.send(embed=embed)
 
 
 def setup(bot):
