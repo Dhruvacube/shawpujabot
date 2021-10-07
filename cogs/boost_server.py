@@ -5,6 +5,11 @@ import random
 class BoostPlugin(commands.Cog):
     def __init__ (self, bot):
         self.bot = bot
+        self.description = 'A Private Boost Plugin'
+        
+    @property
+    def display_emoji(self) -> discord.PartialEmoji:
+        return discord.PartialEmoji(name='nitro1',id='852813350545915905',animated=True)
     
     @commands.is_owner()
     @commands.guild_only()

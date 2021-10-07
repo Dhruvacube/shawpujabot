@@ -11,6 +11,10 @@ class ReactionRoles(commands.Cog):
         self.prefix = 's!'
         self.db = bot.db
         self.description = "Create reaction roles"
+    
+    @property
+    def display_emoji(self) -> discord.PartialEmoji:
+        return discord.PartialEmoji(name='\U000023f9\U0000fe0f')
 
     def isadmin(self, member, guild_id):
         # Checks if command author has an admin role that was added with rl!admin
