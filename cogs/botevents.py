@@ -39,21 +39,22 @@ class BotEvents(commands.Cog):
                 embed.set_image(url='https://i.imgur.com/mktY446.jpeg')
                 embed.set_thumbnail(url='https://i.imgur.com/SizgkEZ.png')
                 embed.set_author(name=self.bot.user.name,
-                                icon_url=self.bot.user.avatar_url)
+                                icon_url=self.bot.user.avatar.url)
                 embed.set_footer(text=f"Welcome {member.name}")
-                await channel.send(member.mention)
-            
+                            
             guild = member.guild
-
-            if not member.bot:
-                # Gets the member role as a `role` object
-                role = discord.utils.get(
-                    guild.roles, id=836985437738369094)
-            else:
-                role = discord.utils.get(
-                    guild.roles, id=850355806926798909)
-            await member.add_roles(role)  # Gives the role to the user
-            await channel.send(embed=embed)
+            if member.bot:
+                role = discord.utils.get(guild.roles, id=850355806926798909)
+                await member.add_roles(role)  # Gives the role to the user
+            await channel.send(content=member.mention,embed=embed)
+    
+    @commands.Cog.listener()
+    async def on_member_update(self, before, after):
+        if not after.pending:
+            if not after.bot:
+                role = discord.utils.get(after.guild.roles, id=836985437738369094)
+                await after.add_roles(role)
+            
 
 
 def setup(bot):
