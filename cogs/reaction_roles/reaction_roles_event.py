@@ -138,7 +138,7 @@ class ReactionRolesEvents(commands.Cog):
 
             except discord.NotFound as e:
                 # If unknown channel or unknown message
-                if e.code == 10003 or e.code == 10008:
+                if e.code in (10003, 10008):
                     delete = self.db.delete(message[0], message[3])
 
                     if isinstance(delete, Exception):
