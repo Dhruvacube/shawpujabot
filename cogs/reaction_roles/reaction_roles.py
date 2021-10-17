@@ -235,7 +235,7 @@ class ReactionRoles(commands.Cog):
                     return (
                         payload.member.id == ctx.message.author.id
                         and payload.message_id == sent_limited_message.id
-                        and (str(payload.emoji) == "🔒" or str(payload.emoji) == "♾️")
+                        and str(payload.emoji) in ("🔒", "♾️")
                     )
 
                 try:
@@ -266,7 +266,7 @@ class ReactionRoles(commands.Cog):
                     return (
                         payload.member.id == ctx.message.author.id
                         and payload.message_id == sent_oldmessagequestion_message.id
-                        and (str(payload.emoji) == "🗨️" or str(payload.emoji) == "🤖")
+                        and str(payload.emoji) in ("🗨️", "🤖")
                     )
 
                 try:
