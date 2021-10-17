@@ -91,7 +91,7 @@ class AnbuBot(commands.AutoShardedBot):
             intents=intents,
             enable_debug_events=True,
             help_command=PaginatedHelpCommand(),
-            owner_ids=set([571889108046184449, 747729781369602049]),
+            owner_ids={571889108046184449, 747729781369602049},
         )
 
     def run(self):
