@@ -27,7 +27,7 @@ class ReactionRolesEvents(commands.Cog):
         self.bot = bot
         self.db = bot.db
         self.base_dir = Path(__file__).resolve().parent
-    
+
     async def getchannel(self, channel_id):
         channel = self.bot.get_channel(channel_id)
 
@@ -277,7 +277,9 @@ class ReactionRolesEvents(commands.Cog):
                                     continue
                                 async for reaction_user in existing_reaction.users():
                                     if reaction_user.id == user_id:
-                                        await msg.remove_reaction(existing_reaction, user)
+                                        await msg.remove_reaction(
+                                            existing_reaction, user
+                                        )
                                         # We can safely break since a user can only have one reaction at once
                                         break
 

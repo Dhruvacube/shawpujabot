@@ -13,22 +13,34 @@ class BotEvents(commands.Cog):
     # on message event
     @commands.Cog.listener()
     async def on_message(self, message):
-        if self.bot.user.mentioned_in(message) and message.mention_everyone is False and message.content.lower() in ('<@!841956732506996756>', '<@841956732506996756>') or message.content.lower() in ('<@!840276343946215516> prefix', '<@840276343946215516> prefix'):
+        if (
+            self.bot.user.mentioned_in(message)
+            and message.mention_everyone is False
+            and message.content.lower()
+            in ("<@!841956732506996756>", "<@841956732506996756>")
+            or message.content.lower()
+            in ("<@!840276343946215516> prefix", "<@840276343946215516> prefix")
+        ):
             if not message.author.bot:
-                await message.channel.send('The prefix is **s!** ,A full list of all commands is available by typing ```s!help```')
+                await message.channel.send(
+                    "The prefix is **s!** ,A full list of all commands is available by typing ```s!help```"
+                )
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
         if member.guild.id == 836841841114480651:
             channel = discord.utils.get(
-                self.bot.get_all_channels(), id=836934061297106955)
+                self.bot.get_all_channels(), id=836934061297106955
+            )
             if member.bot:
                 embed = discord.Embed(
                     title="Seems a new bot added",
                     description=f"<@&854764518316179466> please review this! Its urgent! Seems a new bot named {member.mention} entered! **Sus !**",
-                    color=discord.Color.red()
+                    color=discord.Color.red(),
                 )
-                await channel.send(f'<@&854764518316179466> or {member.guild.owner.mention}')
+                await channel.send(
+                    f"<@&854764518316179466> or {member.guild.owner.mention}"
+                )
             else:
                 embed = discord.Embed(
                     title="Welcome " + member.name + "!",
@@ -36,25 +48,26 @@ class BotEvents(commands.Cog):
                     color=discord.Color.random(),
                     timestamp=datetime.datetime.utcnow(),
                 )
-                embed.set_image(url='https://i.imgur.com/mktY446.jpeg')
-                embed.set_thumbnail(url='https://i.imgur.com/SizgkEZ.png')
-                embed.set_author(name=self.bot.user.name,
-                                icon_url=self.bot.user.avatar.url)
+                embed.set_image(url="https://i.imgur.com/mktY446.jpeg")
+                embed.set_thumbnail(url="https://i.imgur.com/SizgkEZ.png")
+                embed.set_author(
+                    name=self.bot.user.name, icon_url=self.bot.user.avatar.url
+                )
                 embed.set_footer(text=f"Welcome {member.name}")
-                            
+
             guild = member.guild
             if member.bot:
                 role = discord.utils.get(guild.roles, id=850355806926798909)
                 await member.add_roles(role)  # Gives the role to the user
-            await channel.send(content=member.mention,embed=embed)
-    
+            await channel.send(content=member.mention, embed=embed)
+
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         if not after.pending:
             if not after.bot:
-                role = discord.utils.get(after.guild.roles, id=836985437738369094)
+                role = discord.utils.get(
+                    after.guild.roles, id=836985437738369094)
                 await after.add_roles(role)
-            
 
 
 def setup(bot):
